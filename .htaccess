@@ -1,0 +1,133 @@
+# Campo Cidade Conecta Sustentável - Configuração Apache
+# Arquivo .htaccess para configuração do servidor web
+
+# Habilitar reescrita de URLs
+RewriteEngine On
+
+# Configurações de segurança
+# Prevenir acesso a arquivos sensíveis
+<Files ~ "^\.">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Proteger arquivos de configuração
+<FilesMatch "\.(htaccess|htpasswd|ini|log|sh|inc|bak)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Configurações de upload de arquivos
+# Aumentar limite de upload para 10MB
+php_value upload_max_filesize 10M
+php_value post_max_size 10M
+php_value max_execution_time 300
+php_value max_input_time 300
+
+# Configurações de memória
+php_value memory_limit 256M
+
+# Habilitar compressão GZIP
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+</IfModule>
+
+# Configurações de cache
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpg "access plus 1 month"
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/pdf "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType application/x-javascript "access plus 1 month"
+    ExpiresByType application/x-shockwave-flash "access plus 1 month"
+    ExpiresByType image/x-icon "access plus 1 year"
+    ExpiresDefault "access plus 2 days"
+</IfModule>
+
+# Configurações de CORS para desenvolvimento
+<IfModule mod_headers.c>
+    Header always set Access-Control-Allow-Origin "*"
+    Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+</IfModule>
+
+# Redirecionamentos para SPA (Single Page Application)
+# Redirecionar todas as rotas para index.html (para React Router)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Handle Angular and React Router
+    RewriteBase /
+    RewriteRule ^index\.html$ - [L]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule . /index.html [L]
+</IfModule>
+
+# Configurações de segurança adicionais
+# Prevenir clickjacking
+Header always append X-Frame-Options SAMEORIGIN
+
+# Prevenir MIME type sniffing
+Header always set X-Content-Type-Options nosniff
+
+# Habilitar XSS protection
+Header always set X-XSS-Protection "1; mode=block"
+
+# Configurar Content Security Policy
+Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self';"
+
+# Configurações de diretório para uploads
+<IfModule mod_rewrite.c>
+    # Proteger diretório de uploads
+    RewriteCond %{REQUEST_URI} ^/uploads/.*$
+    RewriteCond %{REQUEST_FILENAME} \.(php|php3|php4|php5|phtml|pl|py|jsp|asp|sh|cgi)$ [NC]
+    RewriteRule .* - [F,L]
+</IfModule>
+
+# Configurações de erro personalizadas
+ErrorDocument 404 /404.html
+ErrorDocument 403 /403.html
+ErrorDocument 500 /500.html
+
+# Configurações de charset
+AddDefaultCharset UTF-8
+
+# Configurações para diferentes tipos de arquivo
+<IfModule mod_mime.c>
+    AddType application/javascript .js
+    AddType text/css .css
+    AddType image/svg+xml .svg
+    AddType application/font-woff .woff
+    AddType application/font-woff2 .woff2
+    AddType application/vnd.ms-fontobject .eot
+    AddType application/x-font-ttf .ttf
+</IfModule>
+
+# Configurações específicas para desenvolvimento local (XAMPP)
+<IfModule mod_env.c>
+    SetEnv ENVIRONMENT development
+    SetEnv DB_HOST localhost
+    SetEnv DB_NAME campo_cidade_conecta
+    SetEnv DB_USER root
+    SetEnv DB_PASS ""
+</IfModule>
+
+# Configurações de log (para desenvolvimento)
+<IfModule mod_log_config.c>
+    LogLevel warn
+    CustomLog logs/access.log combined
+    ErrorLog logs/error.log
+</IfModule>

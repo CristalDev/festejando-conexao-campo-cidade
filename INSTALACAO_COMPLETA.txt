@@ -1,0 +1,293 @@
+=================================================================
+CAMPO CIDADE CONECTA SUSTENTÁVEL
+GUIA COMPLETO DE INSTALAÇÃO E CONFIGURAÇÃO
+=================================================================
+
+ÍNDICE:
+1. Requisitos do Sistema
+2. Instalação Local (XAMPP)
+3. Configuração do Banco de Dados
+4. Configuração do Projeto
+5. Instalação em Servidor Web (Hospedagem)
+6. Configuração de Domínio
+7. Configurações de Segurança
+8. Solução de Problemas
+9. Manutenção e Backup
+
+=================================================================
+1. REQUISITOS DO SISTEMA
+=================================================================
+
+PARA DESENVOLVIMENTO LOCAL:
+- XAMPP 8.0 ou superior
+- PHP 8.0 ou superior
+- MySQL 5.7 ou superior
+- Apache 2.4 ou superior
+- Node.js 18 ou superior
+- NPM ou Yarn
+
+PARA SERVIDOR WEB:
+- Hospedagem com suporte a PHP 8.0+
+- MySQL 5.7+ ou MariaDB 10.3+
+- Apache com mod_rewrite habilitado
+- SSL/HTTPS (recomendado)
+- Mínimo 512MB RAM
+- Mínimo 1GB espaço em disco
+
+=================================================================
+2. INSTALAÇÃO LOCAL (XAMPP)
+=================================================================
+
+PASSO 1: INSTALAR XAMPP
+1. Baixe o XAMPP em: https://www.apachefriends.org/
+2. Execute o instalador como administrador
+3. Selecione os componentes: Apache, MySQL, PHP, phpMyAdmin
+4. Instale no diretório padrão: C:\xampp
+
+PASSO 2: CONFIGURAR XAMPP
+1. Abra o XAMPP Control Panel
+2. Inicie os serviços Apache e MySQL
+3. Clique em "Config" do Apache > "httpd.conf"
+4. Verifique se as linhas estão descomentadas:
+   LoadModule rewrite_module modules/mod_rewrite.so
+   
+5. Procure por "AllowOverride None" e altere para "AllowOverride All"
+6. Salve e reinicie o Apache
+
+PASSO 3: CONFIGURAR PHP
+1. Abra o arquivo php.ini (Config > PHP (php.ini))
+2. Altere as seguintes configurações:
+   upload_max_filesize = 10M
+   post_max_size = 10M
+   max_execution_time = 300
+   memory_limit = 256M
+   extension=gd
+   extension=mysqli
+   extension=pdo_mysql
+
+3. Salve e reinicie o Apache
+
+PASSO 4: BAIXAR O PROJETO
+1. Clone ou baixe o projeto para: C:\xampp\htdocs\campo-cidade-conecta
+2. Ou extraia o arquivo ZIP no diretório htdocs
+
+=================================================================
+3. CONFIGURAÇÃO DO BANCO DE DADOS
+=================================================================
+
+PASSO 1: CRIAR BANCO DE DADOS
+1. Acesse: http://localhost/phpmyadmin
+2. Clique em "Novo" para criar um banco
+3. Nome do banco: campo_cidade_conecta
+4. Collation: utf8mb4_unicode_ci
+5. Clique em "Criar"
+
+PASSO 2: IMPORTAR ESTRUTURA
+1. Selecione o banco criado
+2. Clique na aba "Importar"
+3. Escolha o arquivo: database/campo_cidade_conecta.sql
+4. Clique em "Executar"
+
+PASSO 3: VERIFICAR IMPORTAÇÃO
+1. Verifique se as tabelas foram criadas:
+   - users
+   - projects
+   - system_settings
+   - lotteries
+   - lottery_participations
+   - blog_posts
+   - activity_logs
+
+PASSO 4: CONFIGURAR USUÁRIO ADMIN
+1. Na tabela "users", verifique se existe o usuário admin
+2. Email: admin@campocidade.com
+3. Senha padrão: admin123 (ALTERE IMEDIATAMENTE)
+
+=================================================================
+4. CONFIGURAÇÃO DO PROJETO
+=================================================================
+
+PASSO 1: CONFIGURAR BANCO DE DADOS
+1. Abra o arquivo: config/database.php
+2. Verifique as configurações para localhost:
+   DB_HOST: localhost
+   DB_NAME: campo_cidade_conecta
+   DB_USER: root
+   DB_PASS: (vazio para XAMPP)
+
+PASSO 2: CONFIGURAR DIRETÓRIOS
+1. Crie o diretório: uploads/ na raiz do projeto
+2. Configure permissões (Linux/Mac): chmod 755 uploads/
+3. No Windows: Propriedades > Segurança > Permitir escrita
+
+PASSO 3: INSTALAR DEPENDÊNCIAS FRONTEND
+1. Abra o terminal na pasta do projeto
+2. Execute: npm install
+3. Para desenvolvimento: npm run dev
+4. Para produção: npm run build
+
+PASSO 4: CONFIGURAR .HTACCESS
+1. Verifique se o arquivo .htaccess está na raiz
+2. Se necessário, renomeie de htaccess.txt para .htaccess
+
+PASSO 5: TESTAR INSTALAÇÃO
+1. Acesse: http://localhost/campo-cidade-conecta
+2. Verifique se a página carrega corretamente
+3. Teste o envio de um projeto
+4. Acesse o painel admin
+
+=================================================================
+5. INSTALAÇÃO EM SERVIDOR WEB (HOSPEDAGEM)
+=================================================================
+
+PASSO 1: PREPARAR ARQUIVOS
+1. Execute: npm run build (para gerar arquivos de produção)
+2. Compacte todos os arquivos do projeto
+3. Exclua: node_modules/, .git/, arquivos de desenvolvimento
+
+PASSO 2: UPLOAD DOS ARQUIVOS
+1. Acesse o painel da hospedagem (cPanel, Plesk, etc.)
+2. Vá para o Gerenciador de Arquivos
+3. Navegue até public_html/ ou www/
+4. Faça upload e extraia os arquivos
+
+PASSO 3: CONFIGURAR BANCO DE DADOS
+1. No painel da hospedagem, crie um banco MySQL
+2. Anote: nome do banco, usuário, senha, host
+3. Importe o arquivo: database/campo_cidade_conecta.sql
+4. Ou execute o SQL manualmente
+
+PASSO 4: CONFIGURAR CONEXÃO
+1. Edite o arquivo: config/database.php
+2. Altere as configurações de produção:
+   DB_HOST: (fornecido pela hospedagem)
+   DB_NAME: seu_banco_de_dados
+   DB_USER: seu_usuario
+   DB_PASS: sua_senha
+   SITE_URL: https://seudominio.com.br
+
+PASSO 5: CONFIGURAR PERMISSÕES
+1. Configure permissões da pasta uploads/: 755
+2. Configure permissões dos arquivos PHP: 644
+3. Verifique se o .htaccess está funcionando
+
+=================================================================
+6. CONFIGURAÇÃO DE DOMÍNIO
+=================================================================
+
+PASSO 1: APONTAR DOMÍNIO
+1. No painel do registrador do domínio
+2. Configure os nameservers da hospedagem
+3. Ou configure os registros DNS:
+   A: @ -> IP do servidor
+   CNAME: www -> seudominio.com.br
+
+PASSO 2: CONFIGURAR SSL
+1. No painel da hospedagem
+2. Ative o SSL/HTTPS (Let's Encrypt gratuito)
+3. Configure redirecionamento HTTP -> HTTPS
+
+PASSO 3: CONFIGURAR SUBDOMÍNIO (OPCIONAL)
+1. Crie subdomínio: projetos.seudominio.com.br
+2. Aponte para a pasta do projeto
+3. Configure SSL para o subdomínio
+
+=================================================================
+7. CONFIGURAÇÕES DE SEGURANÇA
+=================================================================
+
+PASSO 1: ALTERAR SENHAS PADRÃO
+1. Acesse o banco de dados
+2. Altere a senha do usuário admin
+3. Use hash seguro: password_hash('nova_senha', PASSWORD_DEFAULT)
+
+PASSO 2: CONFIGURAR CHAVES DE SEGURANÇA
+1. Edite: config/database.php
+2. Altere JWT_SECRET e PASSWORD_SALT
+3. Use valores únicos e complexos
+
+PASSO 3: CONFIGURAR BACKUP
+1. Configure backup automático do banco
+2. Configure backup dos arquivos
+3. Teste a restauração regularmente
+
+PASSO 4: MONITORAMENTO
+1. Configure logs de erro
+2. Monitore tentativas de acesso
+3. Configure alertas de segurança
+
+=================================================================
+8. SOLUÇÃO DE PROBLEMAS
+=================================================================
+
+PROBLEMA: Página em branco
+SOLUÇÃO:
+- Verifique os logs de erro do Apache
+- Verifique se o PHP está funcionando
+- Teste com: <?php phpinfo(); ?>
+
+PROBLEMA: Erro de conexão com banco
+SOLUÇÃO:
+- Verifique as credenciais em config/database.php
+- Teste a conexão manualmente
+- Verifique se o MySQL está rodando
+
+PROBLEMA: Upload de imagens não funciona
+SOLUÇÃO:
+- Verifique permissões da pasta uploads/
+- Verifique configurações PHP (upload_max_filesize)
+- Verifique se a pasta existe
+
+PROBLEMA: .htaccess não funciona
+SOLUÇÃO:
+- Verifique se mod_rewrite está habilitado
+- Verifique AllowOverride All no httpd.conf
+- Teste com regras simples primeiro
+
+PROBLEMA: Erro 500
+SOLUÇÃO:
+- Verifique logs de erro
+- Verifique sintaxe do .htaccess
+- Verifique permissões dos arquivos
+
+=================================================================
+9. MANUTENÇÃO E BACKUP
+=================================================================
+
+BACKUP DIÁRIO:
+1. Banco de dados: mysqldump
+2. Arquivos: rsync ou zip
+3. Configurações: versioning
+
+MONITORAMENTO:
+1. Espaço em disco
+2. Performance do banco
+3. Logs de erro
+4. Tentativas de invasão
+
+ATUALIZAÇÕES:
+1. Mantenha PHP atualizado
+2. Atualize dependências
+3. Monitore vulnerabilidades
+4. Teste em ambiente de desenvolvimento
+
+OTIMIZAÇÃO:
+1. Otimize imagens automaticamente
+2. Configure cache
+3. Monitore performance
+4. Otimize consultas SQL
+
+=================================================================
+CONTATOS E SUPORTE
+=================================================================
+
+Para suporte técnico:
+- Email: suporte@seudominio.com.br
+- Documentação: https://seudominio.com.br/docs
+- GitHub: https://github.com/seu-usuario/campo-cidade-conecta
+
+Desenvolvido por: [Seu Nome/Empresa]
+Versão: 1.0.0
+Data: 2024
+
+=================================================================
